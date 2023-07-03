@@ -1,7 +1,7 @@
-import { AddTodoForm } from "./components/AddTodoForm";
-import { TodoList } from "./components/TodoList";
+import { AddTodoForm, TodoList } from "./components/todo";
 import "./styles.css";
 import { useTodo } from "./hooks";
+import { WalletConnectProvider } from "./components/wallet";
 
 export default function App() {
   const {
@@ -16,6 +16,7 @@ export default function App() {
 
   return (
     <>
+      <WalletConnectProvider></WalletConnectProvider>
       {initialized ? (
         <>
           <AddTodoForm addTodo={addTodo} />

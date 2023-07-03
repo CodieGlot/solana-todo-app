@@ -1,4 +1,4 @@
-import { ITodo } from "../interfaces";
+import { ITodo } from "../../interfaces";
 import { TodoItem } from "./TodoItem";
 
 type TodoListProps = {
