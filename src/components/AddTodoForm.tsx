@@ -1,22 +1,16 @@
 import { useState } from "react";
-import { ITodo } from "../interfaces";
 
 type AddTodoFormProps = {
-  setTodos: React.Dispatch<React.SetStateAction<ITodo[]>>;
+  addTodo: (content: string) => void;
 };
 
-export function AddTodoForm({ setTodos }: AddTodoFormProps) {
+export function AddTodoForm({ addTodo }: AddTodoFormProps) {
   const [newItem, setNewItem] = useState("");
 
   const handleAddItem = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setTodos((current: ITodo[]) => {
-      return [
-        ...current,
-        { id: crypto.randomUUID(), content: newItem, completed: false },
-      ];
-    });
+    addTodo(newItem);
 
     setNewItem("");
   };

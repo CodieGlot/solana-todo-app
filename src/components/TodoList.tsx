@@ -2,28 +2,32 @@ import { ITodo } from "../interfaces";
 import { TodoItem } from "./TodoItem";
 
 type TodoListProps = {
+  title: string;
   todos: ITodo[];
-  setTodos: React.Dispatch<React.SetStateAction<ITodo[]>>;
+  toggleTodo: (id: string, completed: boolean) => void;
+  deleteTodo: (id: string) => void;
 };
 
-export function TodoList({ todos, setTodos }: TodoListProps) {
+export function TodoList({
+  title,
+  todos,
+  toggleTodo,
+  deleteTodo,
+}: TodoListProps) {
   return (
     <>
-      <h1>Tasks</h1>
+      <h1>{title}</h1>
       <ul className="list">
-        {todos
-          .filter((todo) => !todo.completed)
-          .map((todo) => {
-            return <TodoItem {...todo} setTodos={setTodos} key={todo.id} />;
-          })}
-      </ul>
-      <h1>Completed</h1>
-      <ul className="list">
-        {todos
-          .filter((todo) => todo.completed)
-          .map((todo) => {
-            return <TodoItem {...todo} setTodos={setTodos} key={todo.id} />;
-          })}
+        {todos.map((todo) => {
+          return (
+            <TodoItem
+              {...todo}
+              toggleTodo={toggleTodo}
+              deleteTodo={deleteTodo}
+              key={todo.id}
+            />
+          );
+        })}
       </ul>
     </>
   );
