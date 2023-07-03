@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 declare global {
   interface Window {
@@ -6,9 +6,15 @@ declare global {
   }
 }
 
-export function WalletConnectProvider() {
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+type WalletConnectProviderProps = {
+  walletAddress: string | null;
+  setWalletAddress: React.Dispatch<React.SetStateAction<string | null>>;
+};
 
+export function WalletConnectProvider({
+  walletAddress,
+  setWalletAddress,
+}: WalletConnectProviderProps) {
   const checkIfWalletConnected = async () => {
     if (window.solana.isPhantom) {
       const response = await window.solana.connect({ onlyIfTrusted: true });

@@ -1,6 +1,6 @@
 import { AddTodoForm, TodoList } from "./components/todo";
 import "./styles.css";
-import { useTodo } from "./hooks";
+import { useTodo, useWallet } from "./hooks";
 import { WalletConnectProvider } from "./components/wallet";
 
 export default function App() {
@@ -14,9 +14,14 @@ export default function App() {
     deleteTodo,
   } = useTodo();
 
+  const { walletAddress, setWalletAddress } = useWallet();
+
   return (
     <>
-      <WalletConnectProvider></WalletConnectProvider>
+      <WalletConnectProvider
+        walletAddress={walletAddress}
+        setWalletAddress={setWalletAddress}
+      ></WalletConnectProvider>
       {initialized ? (
         <>
           <AddTodoForm addTodo={addTodo} />
