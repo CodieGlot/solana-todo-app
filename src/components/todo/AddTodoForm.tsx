@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 type AddTodoFormProps = {
-  addTodo: (content: string) => void;
+  addTodo: (content: string) => Promise<void>;
 };
 
 export function AddTodoForm({ addTodo }: AddTodoFormProps) {

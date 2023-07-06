@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { ITodo } from "../interfaces";
+import { State } from "../constants/state.enum";
 
 import { programID, network, connectionOpts } from "../constants/program";
 import { Connection, PublicKey, SystemProgram } from "@solana/web3.js";
@@ -38,20 +39,20 @@ export function useTodo() {
     return provider;
   }, [walletAddress]);
 
-  const getProgram = async () => {
+  const getProgram = useCallback(async () => {
     const idl = await Program.fetchIdl(programID, anchorProvider);
     return new Program(idl as Idl, programID, anchorProvider);
-  };
+  }, [anchorProvider]);
 
   const initializeUser = async () => {
     const program = await getProgram();
     if (program && walletPubkey) {
       try {
         setTransactionPending(true);
-        const [profilePda, profileBump] = findProgramAddressSync(
-          [new TextEncoder().encode("USER_STATE"), walletPubkey.toBuffer()],
+        const profilePda = findProgramAddressSync(
+          [new TextEncoder().encode(State.USER_STATE), walletPubkey.toBuffer()],
           programID
-        );
+        )[0];
 
         await program.methods
           .initializeUser()
@@ -64,36 +65,128 @@ export function useTodo() {
 
         setInitialized(true);
         toast.success("User initialized successfully");
-      } catch (error: any) {
+      } catch (error) {
         console.log(error);
-        toast.error(error.toString());
+        toast.error((error as any).toString());
+      } finally {
+        setTransactionPending(false);
+      }
+    } else {
+      toast.error("You have to connect to wallet first");
+    }
+  };
+
+  const addTodo = async (content: string) => {
+    const program = await getProgram();
+    if (program && walletPubkey) {
+      try {
+        setTransactionPending(true);
+        const profilePda = findProgramAddressSync(
+          [new TextEncoder().encode(State.USER_STATE), walletPubkey.toBuffer()],
+          programID
+        )[0];
+        const todoPda = findProgramAddressSync(
+          [
+            new TextEncoder().encode(State.TODO_STATE),
+            walletPubkey.toBuffer(),
+            Uint8Array.from([newTodoIdx]),
+          ],
+          program.programId
+        )[0];
+
+        await program.methods
+          .addTodo(content)
+          .accounts({
+            userProfile: profilePda,
+            todoAccount: todoPda,
+            authority: walletPubkey,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc();
+
+        toast.success("Todo added successfully");
+      } catch (error) {
+        console.log(error);
+        toast.error((error as any).toString());
       } finally {
         setTransactionPending(false);
       }
     }
   };
 
-  const addTodo = (content: string) => {
-    /* setTodos((current: ITodo[]) => {
-      return [
-        ...current,
-        { idx: newTodoIdx, content, isCompleted: false },
-      ];
-    }); */
+  const toggleTodo = async (idx: number) => {
+    const program = await getProgram();
+    if (program && walletPubkey) {
+      try {
+        setTransactionPending(true);
+        setLoading(true);
+        const todoPda = findProgramAddressSync(
+          [
+            new TextEncoder().encode(State.TODO_STATE),
+            walletPubkey.toBuffer(),
+            Uint8Array.from([idx]),
+          ],
+          program.programId
+        )[0];
+
+        await program.methods
+          .toggleTodo(idx)
+          .accounts({
+            todoAccount: todoPda,
+            authority: walletPubkey,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc();
+
+        toast.success("Todo has been toggled");
+      } catch (error) {
+        console.log(error);
+        toast.error((error as any).toString());
+      } finally {
+        setTransactionPending(false);
+        setLoading(false);
+      }
+    }
   };
 
-  const toggleTodo = (idx: number, isCompleted: boolean) => {
-    /* setTodos((current: ITodo[]) => {
-      return current.map((todo) =>
-        todo.idx === idx ? { ...todo, isCompleted } : todo
-      );
-    }); */
-  };
+  const deleteTodo = async (idx: number) => {
+    const program = await getProgram();
+    if (program && walletPubkey) {
+      try {
+        setTransactionPending(true);
+        setLoading(true);
+        const profilePda = findProgramAddressSync(
+          [new TextEncoder().encode(State.USER_STATE), walletPubkey.toBuffer()],
+          programID
+        )[0];
+        const todoPda = findProgramAddressSync(
+          [
+            new TextEncoder().encode(State.TODO_STATE),
+            walletPubkey.toBuffer(),
+            Uint8Array.from([idx]),
+          ],
+          program.programId
+        )[0];
 
-  const deleteTodo = (idx: number) => {
-    /* setTodos((current: ITodo[]) => {
-      return current.filter((todo) => todo.idx !== idx);
-    }); */
+        await program.methods
+          .removeTodo(idx)
+          .accounts({
+            userProfile: profilePda,
+            todoAccount: todoPda,
+            authority: walletPubkey,
+            SystemProgram: SystemProgram.programId,
+          })
+          .rpc();
+
+        toast.success("Todo removed successfully");
+      } catch (error) {
+        console.log(error);
+        toast.error((error as any).toString());
+      } finally {
+        setTransactionPending(false);
+        setLoading(false);
+      }
+    }
   };
 
   const incompletedTodos = useMemo(
@@ -117,10 +210,10 @@ export function useTodo() {
       if (program && walletPubkey && !transactionPending) {
         try {
           setLoading(true);
-          const [profilePda, profileBump] = findProgramAddressSync(
+          const profilePda = findProgramAddressSync(
             [new TextEncoder().encode("USER_STATE"), walletPubkey.toBuffer()],
             programID
-          );
+          )[0];
           const profileAccount = await program.account.userProfile.fetch(
             profilePda
           );
@@ -132,7 +225,7 @@ export function useTodo() {
             const todoAccounts: any = await program.account.todoAccount.all([
               authorFilter(walletPubkey.toString()),
             ]);
-            setTodos(todoAccounts);
+            setTodos(todoAccounts.map((account: any) => account.account));
           } else {
             console.log("NOT YET INITIALIZED");
             setInitialized(false);
@@ -148,13 +241,14 @@ export function useTodo() {
     };
 
     findProfileAccount();
-  }, [walletPubkey, transactionPending]);
+  }, [walletPubkey, transactionPending, getProgram]);
 
   return {
     initialized,
     initializeUser,
     walletAddress,
     setWalletAddress,
+    loading,
     incompletedTodos,
     completedTodos,
     todoActions,

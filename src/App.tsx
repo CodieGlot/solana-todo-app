@@ -2,6 +2,7 @@ import { AddTodoForm, TodoList } from "./components/todo";
 import "./styles.css";
 import { useTodo } from "./hooks";
 import { WalletConnectProvider } from "./components/wallet";
+import { Loading } from "./components/states";
 
 export default function App() {
   const {
@@ -9,6 +10,7 @@ export default function App() {
     initializeUser,
     walletAddress,
     setWalletAddress,
+    loading,
     incompletedTodos,
     completedTodos,
     todoActions,
@@ -23,8 +25,18 @@ export default function App() {
       {initialized ? (
         <>
           <AddTodoForm {...todoActions} />
-          <TodoList title="Tasks" todos={incompletedTodos} {...todoActions} />
-          <TodoList title="Completed" todos={completedTodos} {...todoActions} />
+          <Loading loading={loading}>
+            <TodoList
+              title="Tasks"
+              todos={incompletedTodos}
+              todoActions={todoActions}
+            />
+            <TodoList
+              title="Completed"
+              todos={completedTodos}
+              todoActions={todoActions}
+            />
+          </Loading>
         </>
       ) : (
         <button type="button" onClick={() => initializeUser()}>
