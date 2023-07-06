@@ -5,7 +5,7 @@ type TodoListProps = {
   title: string;
   todos: ITodo[];
   todoActions: {
-    toggleTodo: (idx: number) => Promise<void>;
+    toggleTodo: (idx: number, isCompleted: boolean) => Promise<void>;
     deleteTodo: (idx: number) => Promise<void>;
   };
 };

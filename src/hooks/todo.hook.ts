@@ -20,6 +20,7 @@ export function useTodo() {
 
   const [loading, setLoading] = useState(false);
   const [transactionPending, setTransactionPending] = useState(false);
+  const [phantomInstalled, setPhantomInstalled] = useState(false);
 
   const [walletPubkey, setWalletPubkey] = useState<PublicKey | null>(null);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
@@ -35,7 +36,12 @@ export function useTodo() {
       connectionOpts.preflightCommitment as any
     );
 
-    setWalletPubkey(provider.wallet.publicKey);
+    if (window.solana) {
+      setWalletPubkey(provider.wallet.publicKey);
+      setPhantomInstalled(true);
+    } else {
+      toast.error("Phantom wallet not found! Please install first!");
+    }
     return provider;
   }, [walletAddress]);
 
@@ -104,7 +110,7 @@ export function useTodo() {
           })
           .rpc();
 
-        toast.success("Todo added successfully");
+        toast.success("Todo added successfully!");
       } catch (error) {
         console.log(error);
         toast.error((error as any).toString());
@@ -114,7 +120,7 @@ export function useTodo() {
     }
   };
 
-  const toggleTodo = async (idx: number) => {
+  const toggleTodo = async (idx: number, isCompleted: boolean) => {
     const program = await getProgram();
     if (program && walletPubkey) {
       try {
@@ -138,7 +144,9 @@ export function useTodo() {
           })
           .rpc();
 
-        toast.success("Todo has been toggled");
+        isCompleted
+          ? toast.success("Todo has been marked uncompleted!")
+          : toast.success("Todo has been marked completed!");
       } catch (error) {
         console.log(error);
         toast.error((error as any).toString());
@@ -178,7 +186,7 @@ export function useTodo() {
           })
           .rpc();
 
-        toast.success("Todo removed successfully");
+        toast.success("Todo removed successfully!");
       } catch (error) {
         console.log(error);
         toast.error((error as any).toString());
@@ -248,6 +256,7 @@ export function useTodo() {
     initializeUser,
     walletAddress,
     setWalletAddress,
+    phantomInstalled,
     loading,
     incompletedTodos,
     completedTodos,

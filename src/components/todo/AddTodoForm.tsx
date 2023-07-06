@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 type AddTodoFormProps = {
   addTodo: (content: string) => Promise<void>;
@@ -10,9 +11,12 @@ export function AddTodoForm({ addTodo }: AddTodoFormProps) {
   const handleAddItem = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    addTodo(newItem);
-
-    setNewItem("");
+    if (newItem !== "") {
+      addTodo(newItem);
+      setNewItem("");
+    } else {
+      toast.error("Task can not be empty!");
+    }
   };
 
   return (

@@ -1,7 +1,11 @@
-import { AddTodoForm, TodoList } from "./components/todo";
+import { Toaster } from "react-hot-toast";
 import "./styles.css";
 import { useTodo } from "./hooks";
-import { WalletConnectProvider } from "./components/wallet";
+import {
+  InstallPhantomRedirect,
+  WalletConnectProvider,
+} from "./components/wallet";
+import { AddTodoForm, TodoList } from "./components/todo";
 import { Loading } from "./components/states";
 
 export default function App() {
@@ -10,6 +14,7 @@ export default function App() {
     initializeUser,
     walletAddress,
     setWalletAddress,
+    phantomInstalled,
     loading,
     incompletedTodos,
     completedTodos,
@@ -43,6 +48,8 @@ export default function App() {
           Initialize
         </button>
       )}
+      {!phantomInstalled && <InstallPhantomRedirect></InstallPhantomRedirect>}
+      <Toaster position="bottom-center" />
     </>
   );
 }

@@ -2,7 +2,7 @@ type TodoItemProps = {
   idx: number;
   content: string;
   isCompleted: boolean;
-  toggleTodo: (idx: number) => Promise<void>;
+  toggleTodo: (idx: number, isCompleted: boolean) => Promise<void>;
   deleteTodo: (idx: number) => Promise<void>;
 };
 
@@ -18,7 +18,7 @@ export function TodoItem({
       <label>
         <input
           type="checkbox"
-          onChange={() => toggleTodo(idx)}
+          onChange={() => toggleTodo(idx, isCompleted)}
           checked={isCompleted}
         />
         {content}

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { toast } from "react-hot-toast";
 
 declare global {
   interface Window {
@@ -20,7 +21,7 @@ export function WalletConnectProvider({
       const response = await window.solana.connect({ onlyIfTrusted: true });
       setWalletAddress(response.publicKey.toString());
     } else {
-      alert("Phantom wallet not found!");
+      toast.error("Phantom wallet not found!");
     }
   };
 
