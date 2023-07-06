@@ -4,8 +4,8 @@ import { TodoItem } from "./TodoItem";
 type TodoListProps = {
   title: string;
   todos: ITodo[];
-  toggleTodo: (id: string, completed: boolean) => void;
-  deleteTodo: (id: string) => void;
+  toggleTodo: (idx: number, completed: boolean) => void;
+  deleteTodo: (idx: number) => void;
 };
 
 export function TodoList({
@@ -24,7 +24,7 @@ export function TodoList({
               {...todo}
               toggleTodo={toggleTodo}
               deleteTodo={deleteTodo}
-              key={todo.id}
+              key={todo.idx}
             />
           );
         })}

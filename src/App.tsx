@@ -1,20 +1,18 @@
 import { AddTodoForm, TodoList } from "./components/todo";
 import "./styles.css";
-import { useTodo, useWallet } from "./hooks";
+import { useTodo } from "./hooks";
 import { WalletConnectProvider } from "./components/wallet";
 
 export default function App() {
   const {
     initialized,
     initializeUser,
+    walletAddress,
+    setWalletAddress,
     incompletedTodos,
     completedTodos,
-    addTodo,
-    toggleTodo,
-    deleteTodo,
+    todoActions,
   } = useTodo();
-
-  const { walletAddress, setWalletAddress } = useWallet();
 
   return (
     <>
@@ -24,19 +22,9 @@ export default function App() {
       ></WalletConnectProvider>
       {initialized ? (
         <>
-          <AddTodoForm addTodo={addTodo} />
-          <TodoList
-            title="Tasks"
-            todos={incompletedTodos}
-            toggleTodo={toggleTodo}
-            deleteTodo={deleteTodo}
-          />
-          <TodoList
-            title="Completed"
-            todos={completedTodos}
-            toggleTodo={toggleTodo}
-            deleteTodo={deleteTodo}
-          />
+          <AddTodoForm {...todoActions} />
+          <TodoList title="Tasks" todos={incompletedTodos} {...todoActions} />
+          <TodoList title="Completed" todos={completedTodos} {...todoActions} />
         </>
       ) : (
         <button type="button" onClick={() => initializeUser()}>
