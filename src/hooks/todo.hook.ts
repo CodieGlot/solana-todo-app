@@ -72,8 +72,7 @@ export function useTodo() {
         setInitialized(true);
         toast.success("User initialized successfully");
       } catch (error) {
-        console.log(error);
-        toast.error((error as any).toString());
+        toast.error("Fail to initialize user. Try again");
       } finally {
         setTransactionPending(false);
       }
@@ -112,8 +111,7 @@ export function useTodo() {
 
         toast.success("Todo added successfully!");
       } catch (error) {
-        console.log(error);
-        toast.error((error as any).toString());
+        toast.error("Fail to add todo. Try again");
       } finally {
         setTransactionPending(false);
       }
@@ -148,8 +146,7 @@ export function useTodo() {
           ? toast.success("Todo has been marked uncompleted!")
           : toast.success("Todo has been marked completed!");
       } catch (error) {
-        console.log(error);
-        toast.error((error as any).toString());
+        toast.error("Fail to toggle todo. Try again");
       } finally {
         setTransactionPending(false);
         setLoading(false);
@@ -188,8 +185,7 @@ export function useTodo() {
 
         toast.success("Todo removed successfully!");
       } catch (error) {
-        console.log(error);
-        toast.error((error as any).toString());
+        toast.error("Fail to remove todo. Try again");
       } finally {
         setTransactionPending(false);
         setLoading(false);
