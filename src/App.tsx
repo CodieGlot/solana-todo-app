@@ -27,7 +27,7 @@ export default function App() {
         walletAddress={walletAddress}
         setWalletAddress={setWalletAddress}
       ></WalletConnectProvider>
-      {initialized ? (
+      {phantomInstalled && initialized ? (
         <>
           <AddTodoForm {...todoActions} />
           <Loading loading={loading}>
